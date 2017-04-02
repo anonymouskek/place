@@ -32,8 +32,8 @@
               }
           }
 
-          p.panX = options.x;
-          p.panY = options.y;
+          //p.panX = options.x;
+          //p.panY = options.y;
 
           for (var i = 0; i < image_data.length; i += 3) {
             var j = Math.floor((Math.random() * image_data.length) / 3) * 3;
