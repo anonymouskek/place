@@ -1,6 +1,8 @@
 (function() {
     'use strict';
     
+    console.log('Loaded /r/place Cooridination Script');
+    
     $.ajaxSetup({ cache: false });
     var start = new Date();
 
