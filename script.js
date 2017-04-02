@@ -54,22 +54,23 @@
         
         var getData = function(action) {
           $.getJSON('https://raw.githubusercontent.com/anonymouskek/place/master/sync.json', function(data) {
-            if (!data.time) {
-              console.log('Waiting...');   
-              return;
-            }
+              // Removed the time delay so that it starts drawing immediately
+//             if (!data.time) {
+//               console.log('Waiting...');   
+//               return;
+//             }
               
-            var launch = new Date(data.time);
-            if (launch < start) {
-              console.log('Waiting...');  
-              return;
-            }
+//             var launch = new Date(data.time);
+//             if (launch < start) {
+//               console.log('Waiting...');  
+//               return;
+//             }
               
-            var now = new Date();
-            if (now < launch) {
-              console.log('Launch time set for ' + data.time + '. Waiting...');
-              return;
-            }
+//             var now = new Date();
+//             if (now < launch) {
+//               console.log('Launch time set for ' + data.time + '. Waiting...');
+//               return;
+//             }
             action(data);
           });
         };
