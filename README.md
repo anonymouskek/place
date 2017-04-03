@@ -22,6 +22,8 @@ Change "var test = false;" to "var test = true;"
 HOW TO SUBMIT AN IMAGE FOR CONSIDERATION:
 1) Submit a pull request to https://github.com/anonymouskek/place/blob/master/sync.json
 
+Note: If you want to add the transparent color, specify -1 as the color value. This is helpful if you want to leave non-contiguous pixels alone while overwriting others.
+
 IS THIS SAFE?
 
 All the script does is poll the github repository for a new sync.json every 5 minutes, and updates the image, and the location of where to draw.
