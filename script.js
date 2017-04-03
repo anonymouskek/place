@@ -1,6 +1,8 @@
 (function() {
     'use strict';
     
+    var test = false;
+    
     console.log('Loaded /r/place Cooridination Script');
     
     $.ajaxSetup({ cache: false });
@@ -8,11 +10,20 @@
 
     r.placeModule("placePaintBot", function(loader) {
         var c = loader("canvasse");
+        var client = loader("client");
+        var colorsABGR = [];
+        for (var i = 0; i < client.palette.length; i++){
+          colorsABGR[i] = client.getPaletteColorABGR(i);
+        }
+        if (!c) {
+            console.log('Did not find "canvasee"');
+            return;
+        }
         
         var draw = function(options) {
           var p = r.place;
           
-          if (p.getCooldownTimeRemaining() > 200) {
+          if (!test && p.getCooldownTimeRemaining() > 200) {
             return;
           }
 
@@ -20,8 +31,10 @@
           for (var relY = 0; relY < options.image.length; relY++) {
               var row = options.image[relY];
               for (var relX = 0; relX < row.length; relX++) {
-                  var color = options.colors[row[relX]] || -1;
+                  var code = row[relX];
+                  var color = options["colors"][code] || -1;
                   if (color < 0) {
+                      console.log('Unrecognized Color Code: "' + code + '" color: "' + color + '" relX: ' + relX + ' relY: ' + relY);
                       continue;
                   }
                   var absX = options.x + relX;
@@ -32,9 +45,6 @@
               }
           }
 
-          //p.panX = options.x;
-          //p.panY = options.y;
-
           for (var i = 0; i < image_data.length; i += 3) {
             var j = Math.floor((Math.random() * image_data.length) / 3) * 3;
             var x = image_data[j + 0];
@@ -43,40 +53,38 @@
             var currentColor = p.state[c.getIndexFromCoords(x, y)];
 
             if (currentColor != color) {
-              console.log("set color for", x, y, "old", currentColor, "new", color);
-              p.setColor(color);
-              p.drawTile(x, y);
+              var cc = colorsABGR[color];
+              if (test) {
+                  c.drawTileAt(x, y, cc);
+              } else {
+                  console.log("set color for", x, y, "old", currentColor, "new", color);
+                  client.setColor(cc);
+                  client.drawTile(x, y);
+              }
               return;
             }
           }
           console.log("noop");
         };
         
-        var getData = function(action) {
-          $.getJSON('https://raw.githubusercontent.com/anonymouskek/place/master/sync.json', function(data) {
-              // Removed the time delay so that it starts drawing immediately
-//             if (!data.time) {
-//               console.log('Waiting...');   
-//               return;
-//             }
-              
-//             var launch = new Date(data.time);
-//             if (launch < start) {
-//               console.log('Waiting...');  
-//               return;
-//             }
-              
-//             var now = new Date();
-//             if (now < launch) {
-//               console.log('Launch time set for ' + data.time + '. Waiting...');
-//               return;
-//             }
-            action(data);
-          });
+        var options = null;
+        var syncData = function() {
+            $.getJSON('https://raw.githubusercontent.com/anonymouskek/place/master/sync.json', function(data) {
+                options = data;
+            });  
         };
         
+        // Download sync.json
+        syncData();
+        
+        // Periodically attempt to draw a new pixel
         setInterval(function() {
-          getData(draw);
-        }, 1500);
+          if (options) draw(options);
+        }, test ? 1 : 1000);
+        
+        // Every 5 minutes, fetch new sync.json
+        setInterval(function() {
+            syncData();
+        }, 300000);
     });
 })();
